@@ -35,7 +35,7 @@ def main():
     
     # 合并文件
     with open(output_file, 'w') as outfile:
-        for infile in [ipv4_file, ipv6_file]:
+        for infile in [ipv4_file]:
             try:
                 with open(infile, 'r') as f:
                     for line in f:
