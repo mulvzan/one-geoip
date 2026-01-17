@@ -28,10 +28,6 @@ def run_command(command):
 def push_to_ruleset_branch(rule_files):
     """推送规则集文件到rule-set分支"""
     try:
-        # 清理工作目录以避免切换分支时出错
-        print("清理工作目录...")
-        if not run_command("git clean -fd"): return False
-
         # 检查所有规则文件是否存在
         for file in rule_files:
             if not os.path.exists(file):

@@ -85,7 +85,15 @@ def compile_ruleset(binary_name):
         return False
 
 def main():
-    # 依次执行各个脚本
+    # 0. 清理工作目录，确保初始状态干净
+    print("清理工作目录...")
+    # 使用subprocess.run以更好地处理潜在的错误
+    try:
+        subprocess.run("git clean -fd", shell=True, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"清理工作目录失败: {e}")
+        return
+
     # 1. 下载IP和域名列表
     print("开始下载IP和域名列表...")
     subprocess.run(["python", "download_ip_lists.py"], check=True)
