@@ -33,49 +33,61 @@ def push_to_ruleset_branch(rule_files):
             if not os.path.exists(file):
                 print(f"错误: {file} 文件不存在")
                 return False
-        
+
         # 配置Git
         print("配置Git")
-        run_command('git config --global user.name "GitHub Actions"')
-        run_command('git config --global user.email "actions@github.com"')
-        
-        # 获取当前分支名
-        current_branch = subprocess.check_output("git rev-parse --abbrev-ref HEAD", shell=True).decode().strip()
-        print(f"当前分支: {current_branch}")
-        
-        # 检查rule-set分支是否存在
+        if not run_command('git config --global user.name "GitHub Actions"'): return False
+        if not run_command('git config --global user.email "actions@github.com"'): return False
+
+        # 获取当前分支名，并切换到主分支 (main or master)
+        main_branch = "main"
+        if not run_command(f"git checkout {main_branch}"):
+            main_branch = "master"
+            if not run_command(f"git checkout {main_branch}"):
+                print("错误: 无法切换到 'main' 或 'master' 分支。")
+                return False
+        print(f"已切换到主分支: {main_branch}")
+
+        # 检查并删除远程的rule-set分支
         remote_branches = subprocess.check_output("git ls-remote --heads origin", shell=True).decode()
-        branch_exists = "refs/heads/rule-set" in remote_branches
-        
-        if branch_exists:
-            # 如果分支存在，则删除它
-            print("正在删除现有的rule-set分支")
-            run_command("git push origin --delete rule-set")
-            # 等待一些时间确保分支被删除
+        if "refs/heads/rule-set" in remote_branches:
+            print("正在删除远程的rule-set分支")
+            if not run_command("git push origin --delete rule-set"): return False
             time.sleep(2)
-        
+
+        # 检查并删除本地的rule-set分支
+        local_branches = subprocess.check_output("git branch", shell=True).decode()
+        if "rule-set" in local_branches:
+            print("正在删除本地的rule-set分支")
+            if not run_command("git branch -D rule-set"): return False
+
         # 创建并切换到新的rule-set分支
         print("创建rule-set分支")
-        run_command("git checkout --orphan rule-set")
-        
-        # 清除工作区
-        run_command("git rm -rf --cached .")
-        
-        # 添加所有规则文件
+        if not run_command("git checkout --orphan rule-set"): return False
+
+        # 清理工作区并添加规则文件
+        if not run_command("git rm -rf --cached ."): return False
         print(f"添加规则文件: {', '.join(rule_files)}")
         for file in rule_files:
-            run_command(f"git add {file} -f")
-        
+            if not run_command(f"git add -f {file}"): return False
+
         # 提交更改
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         commit_message = f"Update China IP and GFW domain rulesets - {current_time}"
-        run_command(f'git commit -m "{commit_message}"')
-        
+        if not run_command(f'git commit -m "{commit_message}"'):
+             # 即使没有更改也要继续，以支持空提交
+            print("没有更改需要提交，或提交失败。继续推送...")
+
         # 推送到远程
         print("推送到远程rule-set分支")
-        run_command("git push -u origin rule-set")
+        if not run_command("git push -u origin rule-set --force"): return False
                 
         print("成功推送到rule-set分支")
+        
+        # 切换回主分支
+        print(f"操作完成，切换回 {main_branch} 分支")
+        run_command(f"git checkout {main_branch}")
+
         return True
         
     except Exception as e:
