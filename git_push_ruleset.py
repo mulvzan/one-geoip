@@ -25,13 +25,14 @@ def run_command(command):
         print(f"执行命令时出错: {e}")
         return False
 
-def push_to_ruleset_branch():
-    """推送one-china.srs到rule-set分支"""
+def push_to_ruleset_branch(rule_files):
+    """推送规则集文件到rule-set分支"""
     try:
-        # 检查文件是否存在
-        if not os.path.exists("one-china.srs"):
-            print("错误: one-china.srs 文件不存在")
-            return False
+        # 检查所有规则文件是否存在
+        for file in rule_files:
+            if not os.path.exists(file):
+                print(f"错误: {file} 文件不存在")
+                return False
         
         # 配置Git
         print("配置Git")
@@ -60,13 +61,14 @@ def push_to_ruleset_branch():
         # 清除工作区
         run_command("git rm -rf --cached .")
         
-        # 添加文件
-        print("添加one-china.srs文件")
-        run_command("git add one-china.srs -f")
+        # 添加所有规则文件
+        print(f"添加规则文件: {', '.join(rule_files)}")
+        for file in rule_files:
+            run_command(f"git add {file} -f")
         
         # 提交更改
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        commit_message = f"Update China IP ruleset - {current_time}"
+        commit_message = f"Update China IP and GFW domain rulesets - {current_time}"
         run_command(f'git commit -m "{commit_message}"')
         
         # 推送到远程
@@ -81,4 +83,4 @@ def push_to_ruleset_branch():
         return False
 
 if __name__ == "__main__":
-    push_to_ruleset_branch()
+    push_to_ruleset_branch(["one-china.srs", "one-gfw.srs"])

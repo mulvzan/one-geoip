@@ -100,7 +100,12 @@ def main():
         return
     
     # 编译规则集
-    compile_ruleset(binary_name)
+    if not compile_ruleset(binary_name):
+        return
+
+    # 4. 推送规则集
+    print("开始推送规则集到rule-set分支...")
+    subprocess.run(["python", "git_push_ruleset.py"], check=True)
     
     # 清理临时文件
     try:
