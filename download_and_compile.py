@@ -52,19 +52,32 @@ def compile_ruleset(binary_name):
         if not os.path.exists("one-china.json"):
             print("错误: one-china.json 文件不存在")
             return False
+        if not os.path.exists("one-gfw.json"):
+            print("错误: one-gfw.json 文件不存在")
+            return False
         
         # 构建命令
-        cmd = [f"./{binary_name}", "rule-set", "compile", "one-china.json"]
+        cmd1 = [f"./{binary_name}", "rule-set", "compile", "one-china.json"]
+        cmd2 = [f"./{binary_name}", "rule-set", "compile", "one-gfw.json"]
         
-        # 运行命令
-        print(f"正在编译规则集: {' '.join(cmd)}")
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        # 编译 one-china.json
+        print(f"正在编译规则集: {' '.join(cmd1)}")
+        result1 = subprocess.run(cmd1, capture_output=True, text=True)
         
-        if result.returncode != 0:
-            print(f"编译失败: {result.stderr}")
+        if result1.returncode != 0:
+            print(f"编译 one-china.json 失败: {result1.stderr}")
             return False
-            
         print(f"规则集编译成功: one-china.srs")
+
+        # 编译 one-gfw.json
+        print(f"正在编译规则集: {' '.join(cmd2)}")
+        result2 = subprocess.run(cmd2, capture_output=True, text=True)
+
+        if result2.returncode != 0:
+            print(f"编译 one-gfw.json 失败: {result2.stderr}")
+            return False
+        print(f"规则集编译成功: one-gfw.srs")
+        
         return True
         
     except Exception as e:
@@ -72,6 +85,15 @@ def compile_ruleset(binary_name):
         return False
 
 def main():
+    # 依次执行各个脚本
+    # 1. 下载IP和域名列表
+    print("开始下载IP和域名列表...")
+    subprocess.run(["python", "download_ip_lists.py"], check=True)
+    
+    # 2. 创建JSON规则集
+    print("开始创建JSON规则集...")
+    subprocess.run(["python", "create_ruleset.py"], check=True)
+
     # 下载sing-box
     binary_name = download_singbox()
     if not binary_name:

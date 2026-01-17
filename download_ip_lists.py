@@ -21,18 +21,16 @@ def main():
     # 创建临时目录
     os.makedirs("temp", exist_ok=True)
     
-    # 下载IPv4和IPv6列表
+    # 下载IPv4列表
     ipv4_url = "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt"
-    ipv6_url = "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt"
-    
+    gfw_url = "https://github.com/Loyalsoldier/v2ray-rules-dat/raw/refs/heads/release/gfw.txt"
     ipv4_file = "temp/china.txt"
-    ipv6_file = "temp/china6.txt"
+    gfw_file = "temp/gfw.txt"
     output_file = "china.txt"
     
     # 下载文件
     download_file(ipv4_url, ipv4_file)
-    download_file(ipv6_url, ipv6_file)
-    
+    download_file(gfw_url, gfw_file)
     # 合并文件
     with open(output_file, 'w') as outfile:
         for infile in [ipv4_file]:
