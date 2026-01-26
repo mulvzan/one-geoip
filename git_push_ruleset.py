@@ -25,11 +25,17 @@ def run_command(command):
         print(f"执行命令时出错: {e}")
         return False
 
-def push_to_ruleset_branch(rule_files):
+def push_to_ruleset_branch(rule_files, geosite_files):
     """推送规则集文件到rule-set分支"""
     try:
         # 检查所有规则文件是否存在
         for file in rule_files:
+            if not os.path.exists(file):
+                print(f"错误: {file} 文件不存在")
+                return False
+        
+        # 检查所有geosite文件是否存在
+        for file in geosite_files:
             if not os.path.exists(file):
                 print(f"错误: {file} 文件不存在")
                 return False
@@ -70,8 +76,9 @@ def push_to_ruleset_branch(rule_files):
         print(f"添加规则文件: {', '.join(rule_files)}")
         for file in rule_files:
             if not run_command(f"git add -f {file}"): return False
-        run_command("git add -f geosite-cn.srs")
-        run_command("git add -f geosite-geolocation-!cn.srs")
+        print(f"添加geosite文件: {', '.join(geosite_files)}")
+        for file in geosite_files:
+            if not run_command(f"git add -f {file}"): return False
 
         # 提交更改
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -97,4 +104,6 @@ def push_to_ruleset_branch(rule_files):
         return False
 
 if __name__ == "__main__":
-    push_to_ruleset_branch(["one-china.srs", "one-gfw.srs"])
+    rule_files_to_push = ["one-china.srs", "one-gfw.srs"]
+    geosite_files_to_push = ["geosite-cn.srs", "geosite-geolocation-!cn.srs"]
+    push_to_ruleset_branch(rule_files_to_push, geosite_files_to_push)
