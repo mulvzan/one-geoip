@@ -30,10 +30,54 @@ jobs:
       
       - name: Create ruleset JSON
         run: python create_ruleset.py
+
+      - name: Download geosite-geolocation-!cn.srs
+        run: |
+          curl -L -o geosite-cn.srs \
+            https://github.com/MetaCubeX/meta-rules-dat/raw/refs/heads/sing/geo/geosite/cn.srs
+           
+          curl -L -o geosite-geolocation-!cn.srs \
+            https://github.com/SagerNet/sing-geosite/raw/refs/heads/rule-set/geosite-geolocation-!cn.srs
       
+
+
       - name: Download and compile with sing-box
         run: python download_and_compile.py
-      
+
+      - name: Decompile rule-set
+        run: |
+          ./sing-box rule-set decompile geosite-geolocation-!cn.srs -o notcn.json
+          ./sing-box rule-set decompile geosite-cn.srs -o cn.json
+
+
+
+      # 5. 删除所有 domain_regex 字段
+      - name: Remove domain_regex
+        run: |
+          jq 'del(.rules[]?.domain_regex)' notcn.json > notcn_clean.json
+          jq 'del(.rules[]?.domain_regex, .rules[]?.ip_cidr)' cn.json > cn_clean.json
+
+      # 6. 重新编译为 .srs
+      - name: Recompile rule-set
+        run: |
+          ./sing-box rule-set compile cn_clean.json -o geosite-cn.srs
+          ./sing-box rule-set compile notcn_clean.json -o geosite-geolocation-!cn.srs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       - name: Push to rule-set branch
         run: python git_push_ruleset.py
         env:
