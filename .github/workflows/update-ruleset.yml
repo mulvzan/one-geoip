@@ -31,6 +31,11 @@ jobs:
       - name: Create ruleset JSON
         run: python create_ruleset.py
 
+
+
+      - name: Download and compile with sing-box
+        run: python download_and_compile.py
+
       - name: Download geosite-geolocation-!cn.srs
         run: |
           curl -L -o geosite-cn.srs \
@@ -39,11 +44,6 @@ jobs:
           curl -L -o geosite-geolocation-!cn.srs \
             https://github.com/SagerNet/sing-geosite/raw/refs/heads/rule-set/geosite-geolocation-!cn.srs
       
-
-
-      - name: Download and compile with sing-box
-        run: python download_and_compile.py
-
       - name: Decompile rule-set
         run: |
           ./sing-box rule-set decompile geosite-geolocation-!cn.srs -o notcn.json
