@@ -121,8 +121,8 @@ def main():
             shutil.rmtree("temp")
         
         # 删除二进制文件
-        if os.path.exists(binary_name):
-            os.remove(binary_name)
+        # if os.path.exists(binary_name):
+        #     os.remove(binary_name)
     except Exception as e:
         print(f"清理临时文件时出错: {e}")
 
