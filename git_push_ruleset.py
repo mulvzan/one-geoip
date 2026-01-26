@@ -70,8 +70,8 @@ def push_to_ruleset_branch(rule_files):
         print(f"添加规则文件: {', '.join(rule_files)}")
         for file in rule_files:
             if not run_command(f"git add -f {file}"): return False
-        run_command("git add geosite-cn.srs")
-        run_command("geosite-geolocation-!cn.srs")
+        run_command("git add -f geosite-cn.srs")
+        run_command("git add -f geosite-geolocation-!cn.srs")
 
         # 提交更改
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
