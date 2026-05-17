@@ -49,13 +49,16 @@ jobs:
         run: |
           OUTPUT="output/gfw.txt"
 
-          echo "name = GFW" > "$OUTPUT"
+          echo "name = CNICP" > "$OUTPUT"
 
-          # 提取 payload
-          grep '^- ' output/cn-additional-list.yaml \
-            | sed 's/^- //' \
-            | sed 's/^/2, /' \
-            >> "$OUTPUT"
+          awk '
+            /^payload:/ {found=1; next}
+            found && /^ *- / {
+              sub(/^ *- /, "")
+              gsub(/"/, "")
+              print "2, " $0
+            }
+          ' output/cn-additional-list.yaml >> "$OUTPUT"
 
       - name: Commit and Push
         run: |
