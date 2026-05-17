@@ -40,18 +40,18 @@ jobs:
 
           mihomo convert-ruleset domain mrs \
             rules/cn-additional-list.mrs \
-            output/cn-additional-list.yaml
+            output/cn-additional-list.txt
 
           # 删除 YAML 中全部 +
-          sed -i 's/+//g' output/cn-additional-list.yaml
+          sed -i 's/+//g' output/cn-additional-list.txt
 
       - name: Generate Custom TXT
         run: |
-          OUTPUT="output/gfw.txt"
+          OUTPUT="output/CNICP.txt"
 
           echo "name = CNICP" > "$OUTPUT"
 
-          sed '/^$/d' output/cn-additional-list.yaml \
+          sed '/^$/d' output/cn-additional-list.txt \
             | sed 's/^\.//' \
             | sed 's/^/2, /' \
             >> "$OUTPUT"
