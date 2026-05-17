@@ -1,9 +1,12 @@
-name: Convert MRS to YAML
+name: Convert MRS
 
 on:
   workflow_dispatch:
   schedule:
     - cron: '0 */6 * * *'
+
+permissions:
+  contents: write
 
 jobs:
   convert:
@@ -35,20 +38,32 @@ jobs:
         run: |
           mkdir -p output
 
-          mihomo convert-ruleset domain mrs \
+          mihomo convert-ruleset mrs yaml \
             rules/cn-additional-list.mrs \
             output/cn-additional-list.yaml
 
           # 删除 YAML 中全部 +
           sed -i 's/+//g' output/cn-additional-list.yaml
 
+      - name: Generate Custom TXT
+        run: |
+          OUTPUT="output/gfw.txt"
+
+          echo "name = CNICP" > "$OUTPUT"
+
+          # 提取 payload
+          grep '^- ' output/cn-additional-list.yaml \
+            | sed 's/^- //' \
+            | sed 's/^/2, /' \
+            >> "$OUTPUT"
+
       - name: Commit and Push
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add output/cn-additional-list.yaml
+          git add output/
 
-          git diff --cached --quiet || git commit -m "Auto update cn-additional-list.yaml"
+          git diff --cached --quiet || git commit -m "Auto update rules"
 
           git push
