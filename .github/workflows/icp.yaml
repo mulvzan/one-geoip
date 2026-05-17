@@ -49,7 +49,7 @@ jobs:
         run: |
           OUTPUT="output/gfw.txt"
 
-          echo "name = CNICP" > "$OUTPUT"
+          echo "name = GFW" > "$OUTPUT"
 
           # 提取 payload
           grep '^- ' output/cn-additional-list.yaml \
