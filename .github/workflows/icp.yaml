@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir -p output
 
-          mihomo convert-ruleset mrs yaml \
+          mihomo convert-ruleset domain mrs \
             rules/cn-additional-list.mrs \
             output/cn-additional-list.yaml
 
