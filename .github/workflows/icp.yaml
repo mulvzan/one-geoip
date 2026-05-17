@@ -47,7 +47,7 @@ jobs:
 
       - name: Generate Custom TXT
         run: |
-          OUTPUT="output/CNICP.txt"
+          OUTPUT="output/CNICP.arrs"
 
           echo "name = CNICP" > "$OUTPUT"
 
